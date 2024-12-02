@@ -5,6 +5,7 @@ from pathlib import Path
 
 import typer
 import uvicorn
+from fastapi.middleware.cors import CORSMiddleware  # 添加这行导入
 
 app = typer.Typer()
 
@@ -54,6 +55,15 @@ def serve(
             os.environ["LD_LIBRARY_PATH"] = ":".join(LD_LIBRARY_PATH)
 
     import open_webui.main  # we need set environment variables before importing main
+
+    # 添加 CORS 中间件配置
+    open_webui.main.app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # 允许所有源
+        allow_credentials=True,
+        allow_methods=["*"],  # 允许所有方法
+        allow_headers=["*"],  # 允许所有请求头
+    )
 
     uvicorn.run(open_webui.main.app, host=host, port=port, forwarded_allow_ips="*")
 
